@@ -11,7 +11,7 @@ static_assert(DayInt::validate(DayInt::make<31>) == true);
 static_assert(DayInt::validate(DayInt::make<0>) == false);
 static_assert(DayInt::validate(DayInt::make<32>) == false);
 
-TEST_CASE("DayInt construction", "[constrained_integral_constant][range_constrain]")
+TEST_CASE("Range constrained int construction", "[constrained_integral_constant][range_constrain]")
 {
     auto func = [](DayInt) {};
 
@@ -23,8 +23,19 @@ TEST_CASE("DayInt construction", "[constrained_integral_constant][range_constrai
     REQUIRE_THROWS(func(32));
 }
 
-TEST_CASE("DayInt with literal", "[constrained_integral_constant][literals]")
+TEST_CASE("Range constrained int with literal", "[constrained_integral_constant][literals]")
 {
     using namespace stuff::literals;
     DayInt{10_ic};
+    //  won't compile: DayInt{32_ic};
+}
+
+TEST_CASE("Set constrained int construction", "[constrained_integral_constant][set_constrain]")
+{
+    using namespace stuff::literals;
+    using SetOfValues = stuff::set_integral_constant<int, 1, 3, 5>;
+
+    SetOfValues{1_ic};
+    SetOfValues{3_ic};
+    SetOfValues{5_ic};
 }

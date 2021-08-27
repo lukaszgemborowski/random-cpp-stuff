@@ -1,6 +1,12 @@
 #ifndef STUFF_CONSTRAINDER_INTEGRAL_CONSTANT_HPP
 #define STUFF_CONSTRAINDER_INTEGRAL_CONSTANT_HPP
 
+#define STUFF_CONSTRAINED_USE_LITERALS 1
+
+#ifdef STUFF_CONSTRAINED_USE_LITERALS
+# include "integral_constant_literals.hpp"
+#endif
+
 #include <type_traits>
 #include <cassert>
 #include <stdexcept>
@@ -13,6 +19,14 @@ struct range_constrain {
     static constexpr auto validate(T const &val)
     {
         return val >= Min && val <= Max;
+    }
+};
+
+template<class T, T... values>
+struct set_constrain {
+    static constexpr auto validate(T const &val)
+    {
+        return ((val == values) || ...);
     }
 };
 
@@ -29,6 +43,15 @@ public:
     {
         static_assert(Constrain::validate(Val));
     }
+
+#ifdef STUFF_CONSTRAINED_USE_LITERALS
+    template<T Val>
+    constexpr constrained_integral_constant(stuff::integral_constant<T, Val>)
+        : value_ {Val}
+    {
+        static_assert(Constrain::validate(Val));
+    }
+#endif
 
     constexpr constrained_integral_constant(T Val)
         : value_ {Val}
@@ -65,6 +88,10 @@ private:
 template<class T, T Min, T Max>
 using ranged_integral_constant = constrained_integral_constant<
     T, range_constrain<T, Min, Max>>;
+
+template<class T, T... values>
+using set_integral_constant = constrained_integral_constant<
+    T, set_constrain<T, values...>>;
 
 } // namespace stuff
 

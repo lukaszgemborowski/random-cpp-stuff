@@ -6,6 +6,10 @@
 namespace stuff
 {
 
+// simple std::integral_constant-compatbile class
+// the main difference is lack of implcicit convertion to T
+// it stops from -(integral_constant<T, v>) being automatically
+// converted to a T instance
 template<class T, T v>
 struct integral_constant
 {
@@ -23,6 +27,8 @@ struct integral_constant
     }
 };
 
+// this will convert -(integral_constant<T, v>) to integral_constant<T, -v>
+// if T is a signed integer
 template<class T, T v,
     typename = std::enable_if_t<std::is_signed_v<T>>>
 integral_constant<T, -v> operator-(integral_constant<T, v>)
@@ -37,14 +43,14 @@ template<class T, char... Chars> constexpr T make_number() {
     char *p = chars;
     ((*p++ = Chars), ...);
 
-    T res = 0;
+    T res = chars[0] - '0';
 
-    for (std::size_t i = 0; i < sizeof...(Chars); ++i) {
-        res += chars[i] - '0';
+    for (std::size_t i = 1; i < sizeof...(Chars); ++i) {
         res *= 10;
+        res += chars[i] - '0';
     }  
 
-    return res/10;
+    return res;
 }
 
 template<char... Chars> constexpr auto operator ""_ic () {
