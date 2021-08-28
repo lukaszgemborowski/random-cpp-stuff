@@ -38,4 +38,6 @@ TEST_CASE("Set constrained int construction", "[constrained_integral_constant][s
     SetOfValues{1_ic};
     SetOfValues{3_ic};
     SetOfValues{5_ic};
+
+    // won't compile: SetOfValues{10_ic};
 }
